@@ -8,14 +8,15 @@
 import SwiftUI
 
 extension Color {
-    /// Returns a primary contrasting color based on the background color and ensures a minimum contrast ratio.
+    /// Returns a primary contrasting color based on the background color.
     var contrastingPrimary: Color {
-        return contrastColor(threshold: 7.0) // Enforce a higher contrast ratio
+        return contrastColor(threshold: 4.5) // Use WCAG AA for normal text
     }
     
-    /// Returns a secondary contrasting color with a lower threshold for contrast.
+    /// Returns a secondary contrasting color, which is a lighter or darker version of the primary.
     var contrastingSecondary: Color {
-        return contrastColor(threshold: 4.5) // WCAG AA for large text
+        let primaryColor = self.contrastColor(threshold: 4.5)
+        return primaryColor.adjustedLuminance(by: 0.2) // Adjust luminance for secondary
     }
     
     /// Returns a contrasting color for links, typically a shade of blue or another standout color.
@@ -24,15 +25,24 @@ extension Color {
         return linkBlue.hasGoodContrast(with: self, threshold: 4.5) ? linkBlue : .yellow
     }
 
-    /// Determines the contrast color (black or white) based on the luminance of the color and a threshold.
+    /// Determines the contrast color (for example, either black or white) based on the luminance of the background and a contrast threshold.
     private func contrastColor(threshold: Double) -> Color {
         return self.isDark(threshold: threshold) ? .white : .black
+    }
+
+    /// Adjusts the luminance of a color by a given factor.
+    func adjustedLuminance(by factor: CGFloat) -> Color {
+        let components = self.colorComponents
+        let adjustedComponents = components.map { component -> CGFloat in
+            return min(max(component + factor, 0), 1) // Adjust within the 0 to 1 range
+        }
+        return Color(red: adjustedComponents[0], green: adjustedComponents[1], blue: adjustedComponents[2])
     }
 
     /// Determines if the color is dark or light based on the luminance and a contrast ratio threshold.
     private func isDark(threshold: Double) -> Bool {
         let luminance = self.relativeLuminance
-        return (luminance + 0.05) / (0.05) < threshold // Update condition for contrast
+        return (luminance + 0.05) / (0.05) < threshold
     }
     
     /// Calculates the relative luminance of the color based on the RGB values.
