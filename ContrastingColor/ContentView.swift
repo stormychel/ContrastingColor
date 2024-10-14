@@ -1,3 +1,10 @@
+//
+//  ContentView.swift
+//  ContrastingColor
+//
+//  Created by Michel Storms on 14/10/24.
+//
+
 import SwiftUI
 
 struct ContentView: View {
@@ -13,19 +20,20 @@ struct ContentView: View {
                 Image(systemName: "globe")
                     .imageScale(.large)
                     .foregroundStyle(backgroundColor.contrastingPrimary) // Using primary contrasting color
-
+                
                 Text("Hello, world!")
                     .font(.title)
                     .foregroundColor(backgroundColor.contrastingPrimary) // Using primary contrasting color
-
+                
                 Text("This is secondary text.")
                     .foregroundColor(backgroundColor.contrastingSecondary) // Using secondary contrasting color
-
+                
                 Link("Click here", destination: URL(string: "https://example.com")!)
-                    .foregroundColor(backgroundColor.neonLink) // Using brighter neon link color
+                    .foregroundColor(backgroundColor.contrastingLink) // Using link contrasting color
             }
             .padding()
             .cornerRadius(10)
+
         }
         .onTapGesture {
             // Change the background color randomly on tap
@@ -54,24 +62,13 @@ extension Color {
         return primaryColor.adjustedLuminance(by: 0.2) // Adjust luminance for secondary
     }
     
-    /// Returns a neon-like contrasting color for links based on the background color, with extra brightness.
-    var neonLink: Color {
-        return self.adjustedForBrighterNeonlike()
+    /// Returns a contrasting color for links, typically a shade of blue or another standout color.
+    var contrastingLink: Color {
+        let linkBlue = Color.blue
+        return linkBlue.hasGoodContrast(with: self, threshold: 4.5) ? linkBlue : .yellow
     }
 
-    /// Adjusts the background color to make a neon version by heavily increasing saturation and brightness.
-    private func adjustedForBrighterNeonlike() -> Color {
-        let components = self.colorComponents
-        let boostFactor: CGFloat = 0.7  // Adjust this to amplify the neon effect even more
-        let neonColor = Color(
-            hue: components[0],
-            saturation: min(components[1] + boostFactor, 1.0), // Heavily boost saturation
-            brightness: min(components[2] + boostFactor, 1.0)  // Heavily boost brightness
-        )
-        return neonColor
-    }
-
-    /// Determines the contrast color (black or white) based on the luminance of the background and a contrast threshold.
+    /// Determines the contrast color (for example, either black or white) based on the luminance of the background and a contrast threshold.
     private func contrastColor(threshold: Double) -> Color {
         return self.isDark(threshold: threshold) ? .white : .black
     }
@@ -104,11 +101,20 @@ extension Color {
     /// Returns the RGBA components of the color as CGFloat values.
     private var colorComponents: [CGFloat] {
         let uiColor = UIColor(self)
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var brightness: CGFloat = 0
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
         var alpha: CGFloat = 0
-        uiColor.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-        return [hue, saturation, brightness, alpha]
+        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return [red, green, blue, alpha]
+    }
+    
+    /// Determines if a color has a good contrast with the background based on a threshold.
+    private func hasGoodContrast(with backgroundColor: Color, threshold: Double) -> Bool {
+        let foregroundLuminance = self.relativeLuminance
+        let backgroundLuminance = backgroundColor.relativeLuminance
+        let contrastRatio = (foregroundLuminance + 0.05) / (backgroundLuminance + 0.05)
+        return contrastRatio >= threshold
     }
 }
+
