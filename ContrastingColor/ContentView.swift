@@ -7,6 +7,43 @@
 
 import SwiftUI
 
+struct ContentView: View {
+    @State private var backgroundColor: Color = .orange // Initial background color
+
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(backgroundColor.contrastingPrimary) // Using primary contrasting color
+
+            Text("Hello, world!")
+                .font(.title)
+                .foregroundColor(backgroundColor.contrastingPrimary) // Using primary contrasting color
+
+            Text("This is secondary text.")
+                .foregroundColor(backgroundColor.contrastingSecondary) // Using secondary contrasting color
+
+            Link("Click here", destination: URL(string: "https://example.com")!)
+                .foregroundColor(backgroundColor.contrastingLink) // Using link contrasting color
+        }
+        .padding()
+        .background(backgroundColor) // Set background color to test contrasts
+        .cornerRadius(10)
+        .onTapGesture {
+            // Change the background color randomly on tap
+            backgroundColor = Color(
+                red: Double.random(in: 0...1),
+                green: Double.random(in: 0...1),
+                blue: Double.random(in: 0...1)
+            )
+        }
+    }
+}
+
+#Preview {
+    ContentView()
+}
+
 extension Color {
     /// Returns a primary contrasting color based on the background color.
     var contrastingPrimary: Color {
@@ -75,39 +112,3 @@ extension Color {
     }
 }
 
-struct ContentView: View {
-    @State private var backgroundColor: Color = .orange // Initial background color
-
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(backgroundColor.contrastingPrimary) // Using primary contrasting color
-
-            Text("Hello, world!")
-                .font(.title)
-                .foregroundColor(backgroundColor.contrastingPrimary) // Using primary contrasting color
-
-            Text("This is secondary text.")
-                .foregroundColor(backgroundColor.contrastingSecondary) // Using secondary contrasting color
-
-            Link("Click here", destination: URL(string: "https://example.com")!)
-                .foregroundColor(backgroundColor.contrastingLink) // Using link contrasting color
-        }
-        .padding()
-        .background(backgroundColor) // Set background color to test contrasts
-        .cornerRadius(10)
-        .onTapGesture {
-            // Change the background color randomly on tap
-            backgroundColor = Color(
-                red: Double.random(in: 0...1),
-                green: Double.random(in: 0...1),
-                blue: Double.random(in: 0...1)
-            )
-        }
-    }
-}
-
-#Preview {
-    ContentView()
-}
