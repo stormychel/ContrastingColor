@@ -62,12 +62,22 @@ extension Color {
         return primaryColor.adjustedLuminance(by: 0.2) // Adjust luminance for secondary
     }
     
-    /// Returns a contrasting color for links, typically a shade of blue or another standout color.
-    var contrastingLink: Color {
-        let linkBlue = Color.blue
-        return linkBlue.hasGoodContrast(with: self, threshold: 4.5) ? linkBlue : .yellow
-    }
+//    /// Returns a contrasting color for links, typically a shade of blue or another standout color.
+//    var contrastingLink: Color {
+//        let linkBlue = Color.blue
+//        return linkBlue.hasGoodContrast(with: self, threshold: 4.5) ? linkBlue : .yellow
+//    }
 
+    /// Returns a contrasting color for links, ensuring the color has enough contrast against the background.
+    var contrastingLink: Color {
+        // Calculate the relative luminance of the background color
+        let luminance = self.relativeLuminance
+        
+        // If the luminance is high (light background), use a dark color for the link (e.g., blue)
+        // If the luminance is low (dark background), use a light color for the link (e.g., yellow)
+        return luminance > 0.5 ? Color.blue : Color.yellow
+    }
+    
     /// Determines the contrast color (for example, either black or white) based on the luminance of the background and a contrast threshold.
     private func contrastColor(threshold: Double) -> Color {
         return self.isDark(threshold: threshold) ? .white : .black
